@@ -240,7 +240,7 @@ export default function NavBar() {
                   variant="outlined"
                 />
             </div>
-            <IconButton aria-label="show 4 new mails" color="inherit">
+            <IconButton aria-label="show 3 new mails" color="inherit">
               <Badge badgeContent={4} color="secondary">
                 <MailIcon />
               </Badge>
