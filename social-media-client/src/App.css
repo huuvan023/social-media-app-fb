@@ -3,3 +3,7 @@ html,body {
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
 }
+.swal-footer { 
+  display: flex !important;
+  justify-content: center !important; 
+}

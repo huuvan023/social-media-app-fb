@@ -41,23 +41,23 @@ exports.SignUp = (req,res) => {
     let token;
     let error = {};
     if( isEmpty(newUser.email) ) {
-        error.email = "Email must not be emtpy!"
+        error = "Email must not be emtpy!"
     }
     else if( !isEmail(newUser.email) ) {
-        error.email = "Email not valid!";
+        error = "Email not valid!";
     }
 
     if( isEmpty(newUser.password) ) {
-        error.password = "Password must not be empty!";
+        error = "Password must not be empty!";
     }
     if( newUser.password !== newUser.confirmPassword ) {
-        error.confirmPassword = "Passwords not match!";
+        error = "Password not match!";
     }
     if( isEmpty(newUser.handle) ) {
-        error.handle = "Handle must not be empty!";
+        error = "Handle must not be empty!";
     }
 
-    if( Object.keys(error).length > 0 ) return res.status(400).json({ error:error });
+    if( Object.keys(error).length > 0 ) return res.status(400).json({ message:error });
 
     db.doc(`/users/${newUser.handle}`).get()
     .then( rs => {
@@ -79,6 +79,9 @@ exports.SignUp = (req,res) => {
             email: newUser.email,
             createdAt: new Date().toISOString(),
             imageUrl: `https://firebasestorage.googleapis.com/v0/b/${config.storageBucket}/o/${noImage}?alt=media`,
+            bio: "No Information",
+            location: "No Information",
+            website: "No Information",
             userID
         }
         db.doc(`/users/${newUser.handle}`)
@@ -115,7 +118,7 @@ exports.Login = (req,res) => {
         error.email = "Email must not be empty!"
     }
     if( isEmpty(user.password) ) {
-        error.email = "Password must not be empty!"
+        error.password = "Password must not be empty!"
     }
 
     if( Object.keys(error).length > 0 ) return res.status(400).json({ error });
@@ -135,10 +138,19 @@ exports.Login = (req,res) => {
         let replaceWith = ' ';
         //replace all "-" character to " "
         let result = code[1].split(search).join(replaceWith);
-        res.status(500).json({
-            //UpperCase the first character in string
-            message: result.charAt(0).toUpperCase() + result.slice(1),
-        })
+        if( (result.charAt(0).toUpperCase() + result.slice(1)) === "User not found" || (result.charAt(0).toUpperCase() + result.slice(1)) === "Wrong password" ) {
+            res.status(500).json({
+                //UpperCase the first character in string
+                message: "Wrong email or password!",
+            })
+        }
+        else {
+            res.status(500).json({
+                //UpperCase the first character in string
+                message: result.charAt(0).toUpperCase() + result.slice(1),
+            })
+        }
+        
     })
 }
 exports.UploadImage = (req,res) => {

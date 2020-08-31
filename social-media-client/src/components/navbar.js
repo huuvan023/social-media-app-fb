@@ -7,17 +7,36 @@ import Typography from '@material-ui/core/Typography';
 import InputBase from '@material-ui/core/InputBase';
 import Badge from '@material-ui/core/Badge';
 import Avatar from '@material-ui/core/Avatar';
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogTitle from '@material-ui/core/DialogTitle';
 import MenuItem from '@material-ui/core/MenuItem';
 import Menu from '@material-ui/core/Menu';
-import MenuIcon from '@material-ui/icons/Menu';
+import Button from '@material-ui/core/Button';
+import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import SearchIcon from '@material-ui/icons/Search';
 import AccountCircle from '@material-ui/icons/AccountCircle';
-import SettingsIcon from '@material-ui/icons/Settings';
 import MailIcon from '@material-ui/icons/Mail';
 import NotificationsIcon from '@material-ui/icons/Notifications';
 import MoreIcon from '@material-ui/icons/MoreVert';
+import { useTheme } from '@material-ui/core/styles';
+import useMediaQuery from '@material-ui/core/useMediaQuery';
+import { store } from './../store/store';
+import Axios from 'axios';
+import { Link } from 'react-router-dom';
+import Chip from '@material-ui/core/Chip';
 
 const useStyles = makeStyles((theme) => ({
+  root: {
+    display: 'flex',
+    justifyContent: 'center',
+    flexWrap: 'wrap',
+    '& > *': {
+      margin: theme.spacing(0.5),
+    },
+  },
   grow: {
     flexGrow: 1,
   },
@@ -29,6 +48,7 @@ const useStyles = makeStyles((theme) => ({
     [theme.breakpoints.up('sm')]: {
       display: 'block',
     },
+    fontFamily:"Antic"
   },
   search: {
     position: 'relative',
@@ -72,6 +92,7 @@ const useStyles = makeStyles((theme) => ({
   },
   sectionDesktop: {
     display: 'none',
+    alignItems:"center",
     [theme.breakpoints.up('md')]: {
       display: 'flex',
     },
@@ -85,7 +106,7 @@ const useStyles = makeStyles((theme) => ({
   avatarLarge: {
     width: theme.spacing(6),
     height: theme.spacing(6),
-    marginRight: theme.spacing(2)
+    marginRight: theme.spacing(0)
   },
 }));
 
@@ -93,9 +114,13 @@ export default function NavBar() {
   const classes = useStyles();
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
-
+  const [openLogout, setOpen] = React.useState(false)
+  const theme = useTheme();
+  const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
   const isMenuOpen = Boolean(anchorEl);
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
+  const globalState = React.useContext(store)
+  const { dispatch } = globalState;
 
   const handleProfileMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
@@ -113,7 +138,20 @@ export default function NavBar() {
   const handleMobileMenuOpen = (event) => {
     setMobileMoreAnchorEl(event.currentTarget);
   };
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
 
+  const handleClose = () => {
+    setOpen(false);
+  };
+  const onLogout = () => {
+    delete Axios.defaults.headers.common['Authorization']
+    dispatch({ type: "LOG_OUT"})
+  }
+  const handleGoToUser = () => {
+
+  }
   const menuId = 'primary-search-account-menu';
   const renderMenu = (
     <Menu
@@ -170,17 +208,13 @@ export default function NavBar() {
       </MenuItem>
     </Menu>
   );
-
   return (
     <div className={classes.grow}>
       <AppBar position="static">
         <Toolbar>
-          <Avatar className={classes.avatarLarge} alt="logo" src="./logo.png" />
-          <Typography className={classes.title} variant="h5" noWrap>
-            Social Media App
-          </Typography>
-         
-          <div className={classes.grow} />
+          <Link to="/">
+            <Avatar className={classes.avatarLarge} alt="logo" src="./logo.png" />
+          </Link>
           <div className={classes.search}>
             <div className={classes.searchIcon}>
                 <SearchIcon />
@@ -194,7 +228,18 @@ export default function NavBar() {
                 inputProps={{ 'aria-label': 'search' }}
                 />
             </div>
+         
+          <div className={classes.grow} />
           <div className={classes.sectionDesktop}>
+            <div className={classes.root}>
+                <Chip
+                  style={{fontWeight: "bold",color:"white"}}
+                  avatar={<Avatar alt="Natacha" src="/people.png" />}
+                  label="Ngô Hữu Văn"
+                  onClick={handleGoToUser}
+                  variant="outlined"
+                />
+            </div>
             <IconButton aria-label="show 4 new mails" color="inherit">
               <Badge badgeContent={4} color="secondary">
                 <MailIcon />
@@ -210,11 +255,34 @@ export default function NavBar() {
               aria-label="account of current user"
               aria-controls={menuId}
               aria-haspopup="true"
-              onClick={handleProfileMenuOpen}
               color="inherit"
-            >
-              <SettingsIcon />
+              onClick={ handleClickOpen }
+              >
+              <ExitToAppIcon  />
             </IconButton>
+            <Dialog
+                fullScreen={fullScreen}
+                open={openLogout}
+                onClose={handleClose}
+                aria-labelledby="responsive-dialog-title"
+              >
+                <DialogTitle id="responsive-dialog-title">{"Logout?"}</DialogTitle>
+                <DialogContent>
+                  <DialogContentText>
+                  Do you really want to log out?
+                  </DialogContentText>
+                </DialogContent>
+
+                <DialogActions>
+                  <Button autoFocus onClick={handleClose} color="primary">
+                    Cancel
+                  </Button>
+                  <Button onClick={onLogout} 
+                  color="primary" autoFocus>
+                    Sure!
+                  </Button>
+                </DialogActions>
+              </Dialog>
           </div>
           <div className={classes.sectionMobile}>
             <IconButton
