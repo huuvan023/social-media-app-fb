@@ -237,7 +237,7 @@ export default function NavBar() {
                   avatar={<Avatar alt="Natacha" src="/people.png" />}
                   label="Ngô Hữu Văn"
                   onClick={handleGoToUser}
-                  variant="outlined"
+                  variant="outlined" 
                 />
             </div>
             <IconButton aria-label="show 3 new mails" color="inherit">
